@@ -1,0 +1,49 @@
+# Terminal macro file v2
+M1
+d TIM0;
+M2
+d TIM1;
+M3
+d TIM2;
+M4
+d TIM3;
+M5
+d TIM4;
+M6
+d TIM5;
+M7
+
+M8
+d USART1;
+M9
+d USART2;
+M10
+d USART3;
+M11
+d ADC_;
+M12
+d SPI;
+M13
+d TWI;
+M14
+
+M15
+
+M16
+
+M17
+
+M18
+
+M19
+
+M20
+
+M21
+
+M22
+
+M23
+
+M24
+
