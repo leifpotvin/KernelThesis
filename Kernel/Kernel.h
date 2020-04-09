@@ -41,37 +41,37 @@ typedef struct
 {
 	void *stack_ptr;
 	void *stack_base;
-	void *canary_ptr;
+	volatile void *canary_ptr;
 	PTHREAD entry_pnt;
 } thread_ctrl_struct;
 
 typedef struct 
 {
-	uint8_t stack0[T0_STACKSZ];
-	uint8_t stack1[T1_STACKSZ];
-	uint8_t stack2[T2_STACKSZ];
-	uint8_t stack3[T3_STACKSZ];
-	uint8_t stack4[T4_STACKSZ];
-	uint8_t stack5[T5_STACKSZ];
-	uint8_t stack6[T6_STACKSZ];
-	uint8_t stack7[T7_STACKSZ];
+	volatile uint8_t stack0[T0_STACKSZ];
+	volatile uint8_t stack1[T1_STACKSZ];
+	volatile uint8_t stack2[T2_STACKSZ];
+	volatile uint8_t stack3[T3_STACKSZ];
+	volatile uint8_t stack4[T4_STACKSZ];
+	volatile uint8_t stack5[T5_STACKSZ];
+	volatile uint8_t stack6[T6_STACKSZ];
+	volatile uint8_t stack7[T7_STACKSZ];
 } stack_struct;
 
 typedef struct
 {
-	stack_struct stacks;
-	thread_ctrl_struct thread_ctrl_tbl[MAX_THREADS];
-	uint8_t disable_status;
-	uint8_t delay_status;
-	uint16_t delay_ctrs[MAX_THREADS];
+	volatile stack_struct stacks;
+	volatile thread_ctrl_struct thread_ctrl_tbl[MAX_THREADS];
+	volatile uint8_t disable_status;
+	volatile uint8_t delay_status;
+	volatile uint16_t delay_ctrs[MAX_THREADS];
 	
-	uint8_t cur_thread_id;
-	uint8_t cur_thread_mask;
+	volatile uint8_t cur_thread_id;
+	volatile uint8_t cur_thread_mask;
 	
 	uint32_t system_time_millis;
 } kernel_data_struct;
 
-kernel_data_struct kernel_data;
+volatile kernel_data_struct kernel_data;
 
 /*	Global Funcs	*/
 void init();

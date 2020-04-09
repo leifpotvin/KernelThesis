@@ -13,13 +13,37 @@ void f0();
 void f1();
 void f2();
 
+void f0()
+{
+	while(1)
+	{
+		yield();
+	}
+}
+
+void f1()
+{
+	while(1)
+	{
+		yield();
+	}
+}
+
+void f2()
+{
+	while(1)
+	{
+		yield();
+	}
+}
+
 int main(void)
 {
     init();
-	kernel_data.delay_status = 0x11;
-	kernel_data.delay_ctrs[0] = 4;
-	kernel_data.delay_ctrs[4] = 3;
-	kernel_data.delay_ctrs[1] = 5;
+	
+	new(1, f1, true);
+	new(2, f2, true);
+	new(0, f0, true);
     while (1) 
     {
 		x_malloc(10);

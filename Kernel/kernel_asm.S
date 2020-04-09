@@ -17,6 +17,8 @@
 		.global stack_overflow
 
 		/* Variable Defs */
+		.global kernel_data
+		.global kernel_data.cur_thread_id
 
 
 #define X_HI			r27
