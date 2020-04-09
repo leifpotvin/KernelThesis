@@ -7,6 +7,8 @@ Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "PowerTest", "PowerTest\Powe
 EndProject
 Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "Test", "Test\Test.cproj", "{9291B212-25EE-494F-AEB5-F9CB9244A073}"
 EndProject
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "Kernel", "Kernel\Kernel.cproj", "{E7DA5C8B-3A04-40E0-9156-D55436F9E6AC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|AVR = Debug|AVR
@@ -21,6 +23,10 @@ Global
 		{9291B212-25EE-494F-AEB5-F9CB9244A073}.Debug|AVR.Build.0 = Debug|AVR
 		{9291B212-25EE-494F-AEB5-F9CB9244A073}.Release|AVR.ActiveCfg = Release|AVR
 		{9291B212-25EE-494F-AEB5-F9CB9244A073}.Release|AVR.Build.0 = Release|AVR
+		{E7DA5C8B-3A04-40E0-9156-D55436F9E6AC}.Debug|AVR.ActiveCfg = Debug|AVR
+		{E7DA5C8B-3A04-40E0-9156-D55436F9E6AC}.Debug|AVR.Build.0 = Debug|AVR
+		{E7DA5C8B-3A04-40E0-9156-D55436F9E6AC}.Release|AVR.ActiveCfg = Release|AVR
+		{E7DA5C8B-3A04-40E0-9156-D55436F9E6AC}.Release|AVR.Build.0 = Release|AVR
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -8,32 +8,21 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
+#include <stdbool.h>
 
-volatile uint8_t t = 0;
-
-ISR(INT0_vect)
-{
-}
-
-ISR(TIMER0_COMPA_vect)
-{
-	t = (t + 1) & 0x0f;
-	if (!t) PORTB ^= 0x80;
-}
+volatile uint8_t sleep;
 
 ISR(TIMER2_COMPA_vect)
 {
-// 	t = (t + 1) & 0x0f;
-// 	if (!t) PORTB ^= 0x80;
-	
-	//PORTB ^= 0x80;
+	sleep ^= 0x01;
+	OCR2A = sleep ? 0xff : 0x0f;
 }
 
-void idle()
+void s()
 {
 	//SMCR |= 0b010<<SM0;
 	//SMCR |= 0b1<<SE;
-	SMCR = 0b00000101;
+	SMCR = 0b00001111;
 	__asm__("sleep");
 }
 
@@ -61,10 +50,11 @@ void set_tim_wake0()
 	sei();
 }
 
-void set_tim_wake2()
+void set_tim_2()
 {
 	TCCR2A = 0b1 << WGM21;
 	TCCR2B = (0b1 << FOC2A) | (0b111 << CS20);
+	
 	OCR2A = 0xff;
 	
 	TIMSK2 = 0b1 << OCIE2A;
@@ -74,21 +64,36 @@ void set_tim_wake2()
 
 int main(void)
 {
-	set_tim_wake2();	
+	uint8_t mode = 2;
 	
-	DDRB = 0x80;
-    for (int i = 0; i < 4; ++i)
+	switch (mode)
 	{
-		PORTB ^= 0x80;
-		_delay_ms(1000);
+		case 0:
+			while (1);
+			break;
+		case 1:
+			SMCR = 0b00001111;
+			__asm__("sleep");
+			break;
+		case 2:
+			set_tim_2();
+			SMCR = 0b00001111;
+			while(1)
+			{
+				if (sleep) __asm__("sleep");
+			}
+			break;
+		case 3:
+			DDRB = 0x80;
+			for (uint8_t *ptr = (uint8_t *) 0x200; ptr < (uint8_t *) 0x2200; ++ptr)
+			{
+				*ptr = 0xff;
+			}
+			while(1)
+			{
+				_delay_ms(250);
+				PORTB ^= 0x80;
+			}
 	}
-	
-	idle();
-	
-    while (1) 
-    {
-		PORTB ^= 0x80;
-		_delay_ms(250);
-    }
 }
 
