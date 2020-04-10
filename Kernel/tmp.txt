@@ -1,0 +1,11 @@
+@echo off&cls
+setlocal EnableDelayedExpansion
+set $line=%path%
+set $line=%$line: =#%
+set $line=%$line:;= %
+
+for %%a in (%$line%) do echo %%a | find /i "oracle" || set $newpath=!$newpath!;%%a
+set $newpath=!$newpath:#= !
+set $tmp=!$newpath:~1!
+@echo on
+echo $tmp

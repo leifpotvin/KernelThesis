@@ -7,6 +7,7 @@
  */ 
 
 #include "kernel.h"
+#include "struct_offset.h"
 
 		.section .text
 
@@ -18,7 +19,6 @@
 
 		/* Variable Defs */
 		.global kernel_data
-		.global kernel_data.cur_thread_id
 
 
 #define X_HI			r27
@@ -60,12 +60,12 @@ yield:
 
 		//if (kernel_data.thread_ctrl_tbl[cur_thread_id].canary_ptr != CANARY) rcall stack_overflow();
 		; load cur_thread_id
-		ldi X_HI, hi8(kernel_data.cur_thread_id)
-		ldi X_LO, lo8(kernel_data.cur_thread_id)
+		ldi X_HI, hi8(kernel_data + offsetof_kernel_data_struct_cur_thread_id)
+		ldi X_LO, lo8(kernel_data + offsetof_kernel_data_struct_cur_thread_id)
 		ld TID, X
 
-		ldi X_HI, hi8(kernel_data.thread_ctrl_tbl)
-		ldi X_LO, lo8(kernel_data.thread_ctrl_tbl)
+		ldi X_HI, hi8(kernel_data + offsetof_kernel_data_struct_thread_ctrl_tbl)
+		ldi X_LO, lo8(kernel_data + offsetof_kernel_data_struct_thread_ctrl_tbl)
 
 		; compute canary_ptr offset
 		ldi OFFSET, 8			; load sizeof(thread_ctrl_struct)
@@ -87,8 +87,8 @@ schedule:
 		cli
 
 		; load and compute ready stat
-		ldi X_HI, hi8(kernel_data.disable_status)
-		ldi X_LO, lo8(kernel_data.disable_status)
+		ldi X_HI, hi8(kernel_data + offsetof_kernel_data_struct_disable_status)
+		ldi X_LO, lo8(kernel_data + offsetof_kernel_data_struct_disable_status)
 		ld DISABLE_STAT, X+
 		ld DELAY_STAT, X
 		or DISABLE_STAT, DELAY_STAT
@@ -98,13 +98,13 @@ schedule:
 		breq sleep_mode
 
 		; load cur_thread_id
-		ldi X_HI, hi8(kernel_data.cur_thread_id)
-		ldi X_LO, lo8(kernel_data.cur_thread_id)
+		ldi X_HI, hi8(kernel_data + offsetof_kernel_data_struct_cur_thread_id)
+		ldi X_LO, lo8(kernel_data + offsetof_kernel_data_struct_cur_thread_id)
 		ld TID, X
 
 		; load cur_thread_mask
-		ldi X_HI, hi8(kernel_data.cur_thread_mask)
-		ldi X_LO, lo8(kernel_data.cur_thread_mask)
+		ldi X_HI, hi8(kernel_data + offsetof_kernel_data_struct_cur_thread_mask)
+		ldi X_LO, lo8(kernel_data + offsetof_kernel_data_struct_cur_thread_mask)
 		ld TMSK, X
 
 top_of_schedule_loop_schedule:

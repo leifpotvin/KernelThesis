@@ -1,0 +1,8 @@
+#define offsetof_kernel_data_struct_stacks 0
+#define offsetof_kernel_data_struct_thread_ctrl_tbl 256
+#define offsetof_kernel_data_struct_disable_status 320
+#define offsetof_kernel_data_struct_delay_status 321
+#define offsetof_kernel_data_struct_delay_ctrs 322
+#define offsetof_kernel_data_struct_cur_thread_id 338
+#define offsetof_kernel_data_struct_cur_thread_mask 339
+#define offsetof_kernel_data_struct_system_time_millis 340

@@ -8,3 +8,5 @@ kernel_asm.S
 
 main.c
 
+struct_offset.c
+

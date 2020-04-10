@@ -27,6 +27,12 @@ Discarded input sections
  .text          0x00000000        0x0 main.o
  .data          0x00000000        0x0 main.o
  .bss           0x00000000        0x0 main.o
+ .text          0x00000000        0x0 struct_offset.o
+ .data          0x00000000        0x0 struct_offset.o
+ .bss           0x00000000        0x0 struct_offset.o
+ .debug_line    0x00000000        0x0 struct_offset.o
+ .debug_str     0x00000000       0xf9 struct_offset.o
+ .comment       0x00000000       0x31 struct_offset.o
  .text          0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_exit.o)
  .data          0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_exit.o)
  .bss           0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_exit.o)
@@ -79,6 +85,7 @@ LOAD C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.4.331/gcc/
 LOAD kernel.o
 LOAD kernel_asm.o
 LOAD main.o
+LOAD struct_offset.o
 START GROUP
 LOAD c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6\libm.a
 END GROUP
@@ -462,12 +469,12 @@ END GROUP
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000     0x14f0
+.debug_info     0x00000000     0x1516
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x00000000      0xbbc C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.4.331/gcc/dev/atmega2560/avr6/crtatmega2560.o
- .debug_info    0x00000bbc      0x4f9 kernel.o
- .debug_info    0x000010b5       0x69 kernel_asm.o
- .debug_info    0x0000111e      0x3d2 main.o
+ .debug_info    0x00000bbc      0x50c kernel.o
+ .debug_info    0x000010c8       0x69 kernel_asm.o
+ .debug_info    0x00001131      0x3e5 main.o
 
 .debug_abbrev   0x00000000      0xeb7
  *(.debug_abbrev)
