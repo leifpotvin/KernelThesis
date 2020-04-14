@@ -17,7 +17,7 @@ void f0()
 {
 	while(1)
 	{
-		yield();
+		delay(3);
 	}
 }
 
@@ -25,7 +25,7 @@ void f1()
 {
 	while(1)
 	{
-		yield();
+		delay(5);
 	}
 }
 
@@ -33,7 +33,7 @@ void f2()
 {
 	while(1)
 	{
-		yield();
+		delay(7);
 	}
 }
 
@@ -44,9 +44,10 @@ int main(void)
 	new(1, f1, true);
 	new(2, f2, true);
 	new(0, f0, true);
+	
+	yield();
     while (1) 
     {
-		x_malloc(10);
     }
 }
 

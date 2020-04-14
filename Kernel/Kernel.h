@@ -16,7 +16,7 @@
 
 #define MAX_THREADS 8
 
-#define DEFAULT_STACK_SZ 0x20
+#define DEFAULT_STACK_SZ 0x80
 #define T0_STACKSZ DEFAULT_STACK_SZ
 #define T1_STACKSZ DEFAULT_STACK_SZ
 #define T2_STACKSZ DEFAULT_STACK_SZ
@@ -28,20 +28,25 @@
 
 #define CANARY 0xaa
 
+#define GCC_STACK_BASE 0x21ff
+
 #ifndef PREEMPTIVE
 #define THREAD_STACK_CONTEXT_SZ 18
 #else
-#define THREAD_STACK_CONTEXT_SZ 32
-#endif
+#define THREAD_STACK_CONTEXT_SZ 33
+#endif	/* PREEMPTIVE */
 
 #ifndef __ASSEMBLER__
+
+// typedef for thread entry point
 typedef void (*PTHREAD)();
 
+// structures for kernel data
 typedef struct 
 {
-	void *stack_ptr;
-	void *stack_base;
-	volatile void *canary_ptr;
+	volatile uint8_t *stack_ptr;
+	volatile uint8_t *stack_base;
+	volatile uint8_t *canary_ptr;
 	PTHREAD entry_pnt;
 } thread_ctrl_struct;
 
@@ -73,16 +78,15 @@ typedef struct
 
 volatile kernel_data_struct kernel_data;
 
-/*	Global Funcs	*/
+/*	Global Function Prototypes	*/
 void init();
 void new(uint8_t, PTHREAD, bool);
+#ifndef PREEMPTIVE
 void yield();
+#endif /* PREEMPTIVE */
 void schedule();
-
-#ifdef HEAP
-void *x_malloc(size_t);
-void x_free(void *);
-#endif /* HEAP */
+void delay(uint16_t);
+void stack_overflow();
 
 #endif /* __ASSEMBLER__ */
 

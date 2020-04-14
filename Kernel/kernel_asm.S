@@ -6,8 +6,12 @@
  *  Author: Nathan Potvin
  */ 
 
+#ifdef PREEMPTIVE
 #include "kernel.h"
 #include "struct_offset.h"
+
+#define SP_LO_IO_ADDR	0x3d
+#define SP_HI_IO_ADDR	0x3e
 
 		.section .text
 
@@ -15,29 +19,33 @@
 		.global yield
 		.global schedule
 
+		//.global sleep_mode
 		.global stack_overflow
 
 		/* Variable Defs */
 		.global kernel_data
 
 
-#define X_HI			r27
 #define X_LO			r26
+#define X_HI			r27
+#define X_LO_BKUP		r20
+#define X_HI_BKUP		r21
 
-#define DISABLE_STAT	r18
-#define DELAY_STAT		r19
-#define READY_STAT		r18
+#define TID				r18
+#define TMSK			r19
+#define CTRL_SZ			r19
+#define OFFSET_LO		r20
+#define OFFSET_HI		r21
+#define SP_LO			r20
+#define SP_HI			r21
+#define CANARY_REG		r19
 
-#define TID				r20
-#define TMSK			r21
-
-#define OFFSET_HI		r23
-#define OFFSET_LO		r22
-#define OFFSET			r22
-
-#define CANARY_REG		r24
+#define DISABLE_STAT	r22
+#define DELAY_STAT		r23
+#define READY_STAT		r23
 
 yield:
+		; push callee save registers to stack
 		push r2
 		push r3
 		push r4
@@ -57,26 +65,38 @@ yield:
 	
 		push r28
 		push r29
-
-		//if (kernel_data.thread_ctrl_tbl[cur_thread_id].canary_ptr != CANARY) rcall stack_overflow();
-		; load cur_thread_id
+		
+		; save stack pointer
 		ldi X_HI, hi8(kernel_data + offsetof_kernel_data_struct_cur_thread_id)
 		ldi X_LO, lo8(kernel_data + offsetof_kernel_data_struct_cur_thread_id)
 		ld TID, X
-
-		ldi X_HI, hi8(kernel_data + offsetof_kernel_data_struct_thread_ctrl_tbl)
-		ldi X_LO, lo8(kernel_data + offsetof_kernel_data_struct_thread_ctrl_tbl)
-
-		; compute canary_ptr offset
-		ldi OFFSET, 8			; load sizeof(thread_ctrl_struct)
-		mul OFFSET, TID
-		movw OFFSET, r0
-
-		add X_LO, OFFSET_LO		; increment kernel_data.thread_ctrl_tbl by offset to kernel_data.thread_ctrl_tbl[TID]
+		
+		ldi CTRL_SZ, sizeof_thread_ctrl_struct		; compute offset of current trhead's control table
+		mul CTRL_SZ, TID
+		movw X_LO, r0
+		
+		ldi OFFSET_HI, hi8(kernel_data + offsetof_kernel_data_struct_thread_ctrl_tbl + offsetof_thread_ctrl_struct_stack_ptr)
+		ldi OFFSET_LO, lo8(kernel_data + offsetof_kernel_data_struct_thread_ctrl_tbl + offsetof_thread_ctrl_struct_stack_ptr)
+		
+		add X_LO, OFFSET_LO
 		adc X_HI, OFFSET_HI
-
-		adiw X_LO, 4			; increment kernel_data.thread_ctrl_tbl[TID] to kernel_data.thread_ctrl_tbl[TID].canary_ptr
-
+		
+		in SP_HI, SP_HI_IO_ADDR
+		in SP_LO, SP_LO_IO_ADDR
+		
+		st X+, SP_LO
+		st X, SP_HI
+		
+		; verify canary
+		ldi OFFSET_HI, hi8(offsetof_thread_ctrl_struct_canary_ptr - offsetof_thread_ctrl_struct_stack_ptr - 1)
+		ldi OFFSET_LO, lo8(offsetof_thread_ctrl_struct_canary_ptr - offsetof_thread_ctrl_struct_stack_ptr - 1)
+		
+		add X_LO, OFFSET_LO
+		adc X_HI, OFFSET_HI
+		
+		ld X_LO_BKUP, X+ // need to derefence
+		ld X_HI_BKUP, X
+		movw X_LO, X_LO_BKUP
 		ld CANARY_REG, X
 		subi CANARY_REG, CANARY
 		breq schedule
@@ -91,16 +111,16 @@ schedule:
 		ldi X_LO, lo8(kernel_data + offsetof_kernel_data_struct_disable_status)
 		ld DISABLE_STAT, X+
 		ld DELAY_STAT, X
-		or DISABLE_STAT, DELAY_STAT
+		or DELAY_STAT, DISABLE_STAT
 		com READY_STAT
 
 		tst READY_STAT
 		breq sleep_mode
 
 		; load cur_thread_id
-		ldi X_HI, hi8(kernel_data + offsetof_kernel_data_struct_cur_thread_id)
-		ldi X_LO, lo8(kernel_data + offsetof_kernel_data_struct_cur_thread_id)
-		ld TID, X
+//		ldi X_HI, hi8(kernel_data + offsetof_kernel_data_struct_cur_thread_id)
+//		ldi X_LO, lo8(kernel_data + offsetof_kernel_data_struct_cur_thread_id)
+//		ld TID, X
 
 		; load cur_thread_mask
 		ldi X_HI, hi8(kernel_data + offsetof_kernel_data_struct_cur_thread_mask)
@@ -120,7 +140,34 @@ top_of_schedule_loop_schedule:
 
 		sei
 
+
 restore:
+		; save current thread and thread mask
+		ldi X_HI, hi8(kernel_data + offsetof_kernel_data_struct_cur_thread_id)
+		ldi X_LO, lo8(kernel_data + offsetof_kernel_data_struct_cur_thread_id)
+		st X, TID
+		ldi X_HI, hi8(kernel_data + offsetof_kernel_data_struct_cur_thread_mask)
+		ldi X_LO, lo8(kernel_data + offsetof_kernel_data_struct_cur_thread_mask)
+		st X, TMSK
+
+		; restore stack pointer
+		ldi CTRL_SZ, sizeof_thread_ctrl_struct		; compute offset of current trhead's control table
+		mul CTRL_SZ, TID
+		movw X_LO, r0
+		
+		ldi OFFSET_HI, hi8(kernel_data + offsetof_kernel_data_struct_thread_ctrl_tbl + offsetof_thread_ctrl_struct_stack_ptr)
+		ldi OFFSET_LO, lo8(kernel_data + offsetof_kernel_data_struct_thread_ctrl_tbl + offsetof_thread_ctrl_struct_stack_ptr)
+		
+		add X_LO, OFFSET_LO
+		adc X_HI, OFFSET_HI
+		
+		ld SP_LO, X+
+		ld SP_HI, X
+
+		out SP_HI_IO_ADDR, SP_HI
+		out SP_LO_IO_ADDR, SP_LO
+
+		; restore callee save registers
 		pop r29
 		pop r28
 
@@ -143,5 +190,7 @@ restore:
 
 		ret
 
-
 sleep_mode:
+		sei
+		rjmp schedule
+#endif
