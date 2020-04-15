@@ -3,31 +3,31 @@ Kernel.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .data         00000000  00800200  00800200  00000652  2**0
+  0 .data         00000000  00800200  00800200  00000668  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  1 .text         000005de  00000000  00000000  00000074  2**1
+  1 .text         000005f4  00000000  00000000  00000074  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .bss          00000458  00800200  00800200  00000652  2**0
+  2 .bss          00000458  00800200  00800200  00000668  2**0
                   ALLOC
-  3 .comment      00000030  00000000  00000000  00000652  2**0
+  3 .comment      00000030  00000000  00000000  00000668  2**0
                   CONTENTS, READONLY
-  4 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  00000684  2**2
+  4 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  00000698  2**2
                   CONTENTS, READONLY
-  5 .debug_aranges 000000b8  00000000  00000000  000006c4  2**0
+  5 .debug_aranges 000000c8  00000000  00000000  000006d8  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_info   000019ec  00000000  00000000  0000077c  2**0
+  6 .debug_info   00001a08  00000000  00000000  000007a0  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_abbrev 00001073  00000000  00000000  00002168  2**0
+  7 .debug_abbrev 0000100d  00000000  00000000  000021a8  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_line   0000089e  00000000  00000000  000031db  2**0
+  8 .debug_line   000008a7  00000000  00000000  000031b5  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_frame  0000019c  00000000  00000000  00003a7c  2**2
+  9 .debug_frame  000001bc  00000000  00000000  00003a5c  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    000007a9  00000000  00000000  00003c18  2**0
+ 10 .debug_str    000007c9  00000000  00000000  00003c18  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    00000488  00000000  00000000  000043c1  2**0
+ 11 .debug_loc    0000052c  00000000  00000000  000043e1  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 00000088  00000000  00000000  00004849  2**0
+ 12 .debug_ranges 00000098  00000000  00000000  0000490d  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -171,45 +171,33 @@ Disassembly of section .text:
   fe:	a8 35       	cpi	r26, 0x58	; 88
  100:	b2 07       	cpc	r27, r18
  102:	e1 f7       	brne	.-8      	; 0xfc <.do_clear_bss_loop>
- 104:	58 d2       	rcall	.+1200   	; 0x5b6 <main>
- 106:	69 c2       	rjmp	.+1234   	; 0x5da <_exit>
+ 104:	6e d2       	rcall	.+1244   	; 0x5e2 <main>
+ 106:	74 c2       	rjmp	.+1256   	; 0x5f0 <_exit>
 
 00000108 <__bad_interrupt>:
  108:	7b cf       	rjmp	.-266    	; 0x0 <__vectors>
 
 0000010a <init_system_timer>:
-	uint8_t cs2 = 0b101;	// use clkt2s/128 prescaller
-	uint8_t ocie2a = 0b1;	// enable compare match A interrupt
-	uint8_t ocie2b = 0b0;	// disable compare match b interrupt
-	uint8_t toie2 = 0b0;	// disable overflow interrupt
-	
-	TCCR2A = (com2a << COM2A0) | (com2b << COM2B0) | ((wgm2 & 0b11) << WGM20);
+}
+
+static __inline__ void __iRestore(const  uint8_t *__s)
+{
+    SREG = *__s;
+    __asm__ volatile ("" ::: "memory");
  10a:	82 e0       	ldi	r24, 0x02	; 2
  10c:	80 93 b0 00 	sts	0x00B0, r24	; 0x8000b0 <__TEXT_REGION_LENGTH__+0x7c00b0>
-	TCCR2B = (foc2a << FOC2A) | (foc2b << FOC2B) | (((wgm2 & 0b100) >> 2) << WGM22) | (cs2 << CS20);
  110:	95 e0       	ldi	r25, 0x05	; 5
  112:	90 93 b1 00 	sts	0x00B1, r25	; 0x8000b1 <__TEXT_REGION_LENGTH__+0x7c00b1>
-	OCR2A = (F_CPU / 1000) / 128 - 1;
  116:	9c e7       	ldi	r25, 0x7C	; 124
  118:	90 93 b3 00 	sts	0x00B3, r25	; 0x8000b3 <__TEXT_REGION_LENGTH__+0x7c00b3>
-	TIMSK2 = (ocie2a << OCIE2A) | (ocie2b << OCIE2B) | (toie2 << TOIE2);
  11c:	80 93 70 00 	sts	0x0070, r24	; 0x800070 <__TEXT_REGION_LENGTH__+0x7c0070>
-	
-	// set timer to zero
-	kernel_data.system_time_millis = 0;
- 120:	10 92 54 06 	sts	0x0654, r1	; 0x800654 <__DATA_REGION_ORIGIN__+0x454>
- 124:	10 92 55 06 	sts	0x0655, r1	; 0x800655 <__DATA_REGION_ORIGIN__+0x455>
- 128:	10 92 56 06 	sts	0x0656, r1	; 0x800656 <__DATA_REGION_ORIGIN__+0x456>
- 12c:	10 92 57 06 	sts	0x0657, r1	; 0x800657 <__DATA_REGION_ORIGIN__+0x457>
+ 120:	10 92 54 06 	sts	0x0654, r1	; 0x800654 <_edata+0x454>
+ 124:	10 92 55 06 	sts	0x0655, r1	; 0x800655 <_edata+0x455>
+ 128:	10 92 56 06 	sts	0x0656, r1	; 0x800656 <_edata+0x456>
+ 12c:	10 92 57 06 	sts	0x0657, r1	; 0x800657 <_edata+0x457>
  130:	08 95       	ret
 
 00000132 <push_pthread>:
- *	func:	the function pointer to be pushed
- */
-void push_pthread(uint8_t tid, PTHREAD func)
-{
-	// push low order byte
-	*(kernel_data.thread_ctrl_tbl[tid].stack_ptr--) = (uint8_t) ((((uint16_t) func) & 0x00ff) >> 0);
  132:	28 e0       	ldi	r18, 0x08	; 8
  134:	82 9f       	mul	r24, r18
  136:	c0 01       	movw	r24, r0
@@ -224,8 +212,6 @@ void push_pthread(uint8_t tid, PTHREAD func)
  148:	91 83       	std	Z+1, r25	; 0x01
  14a:	80 83       	st	Z, r24
  14c:	6c 93       	st	X, r22
-	// push middle order byte
-	*(kernel_data.thread_ctrl_tbl[tid].stack_ptr--) = (uint8_t) ((((uint16_t) func) & 0xff00) >> 8);
  14e:	a0 81       	ld	r26, Z
  150:	b1 81       	ldd	r27, Z+1	; 0x01
  152:	cd 01       	movw	r24, r26
@@ -233,11 +219,6 @@ void push_pthread(uint8_t tid, PTHREAD func)
  156:	91 83       	std	Z+1, r25	; 0x01
  158:	80 83       	st	Z, r24
  15a:	7c 93       	st	X, r23
-	// push high order byte
-	// because the ATmega2560 has a 17 bit address space for program memory and gcc uses 
-	// 16 bit address space, the high order byte is always zero for a function pointer and 
-	//trampoline tables are used for functions in high parts of program memory
-	*(kernel_data.thread_ctrl_tbl[tid].stack_ptr--) = (uint8_t) (0x00);
  15c:	a0 81       	ld	r26, Z
  15e:	b1 81       	ldd	r27, Z+1	; 0x01
  160:	cd 01       	movw	r24, r26
@@ -248,123 +229,78 @@ void push_pthread(uint8_t tid, PTHREAD func)
  16a:	08 95       	ret
 
 0000016c <init>:
-
-/*
- *	Initializes kernel data structures.
- */
-void init()
-{	
  16c:	1f 93       	push	r17
  16e:	cf 93       	push	r28
  170:	df 93       	push	r29
-	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
  172:	1f b7       	in	r17, 0x3f	; 63
-    return 1;
-}
-
-static __inline__ uint8_t __iCliRetVal(void)
-{
-    cli();
  174:	f8 94       	cli
-	{
-		// set the stack base pointer for each thread
-		kernel_data.thread_ctrl_tbl[0].stack_base = (uint8_t *) (kernel_data.stacks.stack0 + T0_STACKSZ - 1);
  176:	8f e7       	ldi	r24, 0x7F	; 127
  178:	92 e0       	ldi	r25, 0x02	; 2
- 17a:	90 93 03 06 	sts	0x0603, r25	; 0x800603 <__DATA_REGION_ORIGIN__+0x403>
- 17e:	80 93 02 06 	sts	0x0602, r24	; 0x800602 <__DATA_REGION_ORIGIN__+0x402>
-		kernel_data.thread_ctrl_tbl[1].stack_base = (uint8_t *) (kernel_data.stacks.stack1 + T1_STACKSZ - 1);
+ 17a:	90 93 03 06 	sts	0x0603, r25	; 0x800603 <_edata+0x403>
+ 17e:	80 93 02 06 	sts	0x0602, r24	; 0x800602 <_edata+0x402>
  182:	8f ef       	ldi	r24, 0xFF	; 255
  184:	92 e0       	ldi	r25, 0x02	; 2
- 186:	90 93 0b 06 	sts	0x060B, r25	; 0x80060b <__DATA_REGION_ORIGIN__+0x40b>
- 18a:	80 93 0a 06 	sts	0x060A, r24	; 0x80060a <__DATA_REGION_ORIGIN__+0x40a>
-		kernel_data.thread_ctrl_tbl[2].stack_base = (uint8_t *) (kernel_data.stacks.stack2 + T2_STACKSZ - 1);
+ 186:	90 93 0b 06 	sts	0x060B, r25	; 0x80060b <_edata+0x40b>
+ 18a:	80 93 0a 06 	sts	0x060A, r24	; 0x80060a <_edata+0x40a>
  18e:	8f e7       	ldi	r24, 0x7F	; 127
  190:	93 e0       	ldi	r25, 0x03	; 3
- 192:	90 93 13 06 	sts	0x0613, r25	; 0x800613 <__DATA_REGION_ORIGIN__+0x413>
- 196:	80 93 12 06 	sts	0x0612, r24	; 0x800612 <__DATA_REGION_ORIGIN__+0x412>
-		kernel_data.thread_ctrl_tbl[3].stack_base = (uint8_t *) (kernel_data.stacks.stack3 + T3_STACKSZ - 1);
+ 192:	90 93 13 06 	sts	0x0613, r25	; 0x800613 <_edata+0x413>
+ 196:	80 93 12 06 	sts	0x0612, r24	; 0x800612 <_edata+0x412>
  19a:	8f ef       	ldi	r24, 0xFF	; 255
  19c:	93 e0       	ldi	r25, 0x03	; 3
- 19e:	90 93 1b 06 	sts	0x061B, r25	; 0x80061b <__DATA_REGION_ORIGIN__+0x41b>
- 1a2:	80 93 1a 06 	sts	0x061A, r24	; 0x80061a <__DATA_REGION_ORIGIN__+0x41a>
-		kernel_data.thread_ctrl_tbl[4].stack_base = (uint8_t *) (kernel_data.stacks.stack4 + T4_STACKSZ - 1);
+ 19e:	90 93 1b 06 	sts	0x061B, r25	; 0x80061b <_edata+0x41b>
+ 1a2:	80 93 1a 06 	sts	0x061A, r24	; 0x80061a <_edata+0x41a>
  1a6:	8f e7       	ldi	r24, 0x7F	; 127
  1a8:	94 e0       	ldi	r25, 0x04	; 4
- 1aa:	90 93 23 06 	sts	0x0623, r25	; 0x800623 <__DATA_REGION_ORIGIN__+0x423>
- 1ae:	80 93 22 06 	sts	0x0622, r24	; 0x800622 <__DATA_REGION_ORIGIN__+0x422>
-		kernel_data.thread_ctrl_tbl[5].stack_base = (uint8_t *) (kernel_data.stacks.stack5 + T5_STACKSZ - 1);
+ 1aa:	90 93 23 06 	sts	0x0623, r25	; 0x800623 <_edata+0x423>
+ 1ae:	80 93 22 06 	sts	0x0622, r24	; 0x800622 <_edata+0x422>
  1b2:	8f ef       	ldi	r24, 0xFF	; 255
  1b4:	94 e0       	ldi	r25, 0x04	; 4
- 1b6:	90 93 2b 06 	sts	0x062B, r25	; 0x80062b <__DATA_REGION_ORIGIN__+0x42b>
- 1ba:	80 93 2a 06 	sts	0x062A, r24	; 0x80062a <__DATA_REGION_ORIGIN__+0x42a>
-		kernel_data.thread_ctrl_tbl[6].stack_base = (uint8_t *) (kernel_data.stacks.stack6 + T6_STACKSZ - 1);
+ 1b6:	90 93 2b 06 	sts	0x062B, r25	; 0x80062b <_edata+0x42b>
+ 1ba:	80 93 2a 06 	sts	0x062A, r24	; 0x80062a <_edata+0x42a>
  1be:	8f e7       	ldi	r24, 0x7F	; 127
  1c0:	95 e0       	ldi	r25, 0x05	; 5
- 1c2:	90 93 33 06 	sts	0x0633, r25	; 0x800633 <__DATA_REGION_ORIGIN__+0x433>
- 1c6:	80 93 32 06 	sts	0x0632, r24	; 0x800632 <__DATA_REGION_ORIGIN__+0x432>
-		kernel_data.thread_ctrl_tbl[7].stack_base = (uint8_t *) (kernel_data.stacks.stack7 + T7_STACKSZ - 1);
+ 1c2:	90 93 33 06 	sts	0x0633, r25	; 0x800633 <_edata+0x433>
+ 1c6:	80 93 32 06 	sts	0x0632, r24	; 0x800632 <_edata+0x432>
  1ca:	8f ef       	ldi	r24, 0xFF	; 255
  1cc:	95 e0       	ldi	r25, 0x05	; 5
- 1ce:	90 93 3b 06 	sts	0x063B, r25	; 0x80063b <__DATA_REGION_ORIGIN__+0x43b>
- 1d2:	80 93 3a 06 	sts	0x063A, r24	; 0x80063a <__DATA_REGION_ORIGIN__+0x43a>
-		
-		// set stack canary pointer for each thread
-		kernel_data.thread_ctrl_tbl[0].canary_ptr = kernel_data.stacks.stack0;
+ 1ce:	90 93 3b 06 	sts	0x063B, r25	; 0x80063b <_edata+0x43b>
+ 1d2:	80 93 3a 06 	sts	0x063A, r24	; 0x80063a <_edata+0x43a>
  1d6:	80 e0       	ldi	r24, 0x00	; 0
  1d8:	92 e0       	ldi	r25, 0x02	; 2
- 1da:	90 93 05 06 	sts	0x0605, r25	; 0x800605 <__DATA_REGION_ORIGIN__+0x405>
- 1de:	80 93 04 06 	sts	0x0604, r24	; 0x800604 <__DATA_REGION_ORIGIN__+0x404>
-		kernel_data.thread_ctrl_tbl[1].canary_ptr = kernel_data.stacks.stack1;
+ 1da:	90 93 05 06 	sts	0x0605, r25	; 0x800605 <_edata+0x405>
+ 1de:	80 93 04 06 	sts	0x0604, r24	; 0x800604 <_edata+0x404>
  1e2:	80 e8       	ldi	r24, 0x80	; 128
  1e4:	92 e0       	ldi	r25, 0x02	; 2
- 1e6:	90 93 0d 06 	sts	0x060D, r25	; 0x80060d <__DATA_REGION_ORIGIN__+0x40d>
- 1ea:	80 93 0c 06 	sts	0x060C, r24	; 0x80060c <__DATA_REGION_ORIGIN__+0x40c>
-		kernel_data.thread_ctrl_tbl[2].canary_ptr = kernel_data.stacks.stack2;
+ 1e6:	90 93 0d 06 	sts	0x060D, r25	; 0x80060d <_edata+0x40d>
+ 1ea:	80 93 0c 06 	sts	0x060C, r24	; 0x80060c <_edata+0x40c>
  1ee:	80 e0       	ldi	r24, 0x00	; 0
  1f0:	93 e0       	ldi	r25, 0x03	; 3
- 1f2:	90 93 15 06 	sts	0x0615, r25	; 0x800615 <__DATA_REGION_ORIGIN__+0x415>
- 1f6:	80 93 14 06 	sts	0x0614, r24	; 0x800614 <__DATA_REGION_ORIGIN__+0x414>
-		kernel_data.thread_ctrl_tbl[3].canary_ptr = kernel_data.stacks.stack3;
+ 1f2:	90 93 15 06 	sts	0x0615, r25	; 0x800615 <_edata+0x415>
+ 1f6:	80 93 14 06 	sts	0x0614, r24	; 0x800614 <_edata+0x414>
  1fa:	80 e8       	ldi	r24, 0x80	; 128
  1fc:	93 e0       	ldi	r25, 0x03	; 3
- 1fe:	90 93 1d 06 	sts	0x061D, r25	; 0x80061d <__DATA_REGION_ORIGIN__+0x41d>
- 202:	80 93 1c 06 	sts	0x061C, r24	; 0x80061c <__DATA_REGION_ORIGIN__+0x41c>
-		kernel_data.thread_ctrl_tbl[4].canary_ptr = kernel_data.stacks.stack4;
+ 1fe:	90 93 1d 06 	sts	0x061D, r25	; 0x80061d <_edata+0x41d>
+ 202:	80 93 1c 06 	sts	0x061C, r24	; 0x80061c <_edata+0x41c>
  206:	80 e0       	ldi	r24, 0x00	; 0
  208:	94 e0       	ldi	r25, 0x04	; 4
- 20a:	90 93 25 06 	sts	0x0625, r25	; 0x800625 <__DATA_REGION_ORIGIN__+0x425>
- 20e:	80 93 24 06 	sts	0x0624, r24	; 0x800624 <__DATA_REGION_ORIGIN__+0x424>
-		kernel_data.thread_ctrl_tbl[5].canary_ptr = kernel_data.stacks.stack5;
+ 20a:	90 93 25 06 	sts	0x0625, r25	; 0x800625 <_edata+0x425>
+ 20e:	80 93 24 06 	sts	0x0624, r24	; 0x800624 <_edata+0x424>
  212:	80 e8       	ldi	r24, 0x80	; 128
  214:	94 e0       	ldi	r25, 0x04	; 4
- 216:	90 93 2d 06 	sts	0x062D, r25	; 0x80062d <__DATA_REGION_ORIGIN__+0x42d>
- 21a:	80 93 2c 06 	sts	0x062C, r24	; 0x80062c <__DATA_REGION_ORIGIN__+0x42c>
-		kernel_data.thread_ctrl_tbl[6].canary_ptr = kernel_data.stacks.stack6;
+ 216:	90 93 2d 06 	sts	0x062D, r25	; 0x80062d <_edata+0x42d>
+ 21a:	80 93 2c 06 	sts	0x062C, r24	; 0x80062c <_edata+0x42c>
  21e:	80 e0       	ldi	r24, 0x00	; 0
  220:	95 e0       	ldi	r25, 0x05	; 5
- 222:	90 93 35 06 	sts	0x0635, r25	; 0x800635 <__DATA_REGION_ORIGIN__+0x435>
- 226:	80 93 34 06 	sts	0x0634, r24	; 0x800634 <__DATA_REGION_ORIGIN__+0x434>
-		kernel_data.thread_ctrl_tbl[7].canary_ptr = kernel_data.stacks.stack7;
+ 222:	90 93 35 06 	sts	0x0635, r25	; 0x800635 <_edata+0x435>
+ 226:	80 93 34 06 	sts	0x0634, r24	; 0x800634 <_edata+0x434>
  22a:	80 e8       	ldi	r24, 0x80	; 128
  22c:	95 e0       	ldi	r25, 0x05	; 5
- 22e:	90 93 3d 06 	sts	0x063D, r25	; 0x80063d <__DATA_REGION_ORIGIN__+0x43d>
- 232:	80 93 3c 06 	sts	0x063C, r24	; 0x80063c <__DATA_REGION_ORIGIN__+0x43c>
+ 22e:	90 93 3d 06 	sts	0x063D, r25	; 0x80063d <_edata+0x43d>
+ 232:	80 93 3c 06 	sts	0x063C, r24	; 0x80063c <_edata+0x43c>
  236:	20 e0       	ldi	r18, 0x00	; 0
  238:	30 e0       	ldi	r19, 0x00	; 0
-			// initialize the stack pointer to the stack base
-			kernel_data.thread_ctrl_tbl[i].stack_ptr = kernel_data.thread_ctrl_tbl[i].stack_base;
-			// initialize the entry point for each thread to null
-			kernel_data.thread_ctrl_tbl[i].entry_pnt = (PTHREAD) 0x0000;
-			// set the canary in each stack
-			*(kernel_data.thread_ctrl_tbl[i].canary_ptr) = CANARY;
  23a:	6a ea       	ldi	r22, 0xAA	; 170
-		
-		// initialize remaining variables for each thread
-		for (uint8_t i = 0; i < MAX_THREADS; ++i)
-		{
-			// initialize the stack pointer to the stack base
-			kernel_data.thread_ctrl_tbl[i].stack_ptr = kernel_data.thread_ctrl_tbl[i].stack_base;
  23c:	c9 01       	movw	r24, r18
  23e:	88 0f       	add	r24, r24
  240:	99 1f       	adc	r25, r25
@@ -390,22 +326,16 @@ static __inline__ uint8_t __iCliRetVal(void)
  268:	fa 4f       	sbci	r31, 0xFA	; 250
  26a:	51 83       	std	Z+1, r21	; 0x01
  26c:	40 83       	st	Z, r20
-			// initialize the entry point for each thread to null
-			kernel_data.thread_ctrl_tbl[i].entry_pnt = (PTHREAD) 0x0000;
  26e:	fc 01       	movw	r30, r24
  270:	ea 5f       	subi	r30, 0xFA	; 250
  272:	fb 4f       	sbci	r31, 0xFB	; 251
  274:	11 82       	std	Z+1, r1	; 0x01
  276:	10 82       	st	Z, r1
-			// set the canary in each stack
-			*(kernel_data.thread_ctrl_tbl[i].canary_ptr) = CANARY;
  278:	32 97       	sbiw	r30, 0x02	; 2
  27a:	01 90       	ld	r0, Z+
  27c:	f0 81       	ld	r31, Z
  27e:	e0 2d       	mov	r30, r0
  280:	60 83       	st	Z, r22
-			// clear each delay counter
-			kernel_data.delay_ctrs[i] = 0x0000;
  282:	f9 01       	movw	r30, r18
  284:	ee 0f       	add	r30, r30
  286:	ff 1f       	adc	r31, r31
@@ -415,37 +345,15 @@ static __inline__ uint8_t __iCliRetVal(void)
  28e:	10 82       	st	Z, r1
  290:	2f 5f       	subi	r18, 0xFF	; 255
  292:	3f 4f       	sbci	r19, 0xFF	; 255
-		kernel_data.thread_ctrl_tbl[5].canary_ptr = kernel_data.stacks.stack5;
-		kernel_data.thread_ctrl_tbl[6].canary_ptr = kernel_data.stacks.stack6;
-		kernel_data.thread_ctrl_tbl[7].canary_ptr = kernel_data.stacks.stack7;
-		
-		// initialize remaining variables for each thread
-		for (uint8_t i = 0; i < MAX_THREADS; ++i)
  294:	28 30       	cpi	r18, 0x08	; 8
  296:	31 05       	cpc	r19, r1
  298:	89 f6       	brne	.-94     	; 0x23c <init+0xd0>
-			// clear each delay counter
-			kernel_data.delay_ctrs[i] = 0x0000;
-		}
-		
-		// set only thread 0 as enabled
-		kernel_data.disable_status = 0xfe;
  29a:	8e ef       	ldi	r24, 0xFE	; 254
- 29c:	80 93 40 06 	sts	0x0640, r24	; 0x800640 <__DATA_REGION_ORIGIN__+0x440>
-		// set all threads to not be delayed
-		kernel_data.delay_status = 0x00;
- 2a0:	10 92 41 06 	sts	0x0641, r1	; 0x800641 <__DATA_REGION_ORIGIN__+0x441>
-		
-		// set current thread to thread 0
-		kernel_data.cur_thread_id = 0;
- 2a4:	10 92 52 06 	sts	0x0652, r1	; 0x800652 <__DATA_REGION_ORIGIN__+0x452>
-		kernel_data.cur_thread_mask = 0x01;
+ 29c:	80 93 40 06 	sts	0x0640, r24	; 0x800640 <_edata+0x440>
+ 2a0:	10 92 41 06 	sts	0x0641, r1	; 0x800641 <_edata+0x441>
+ 2a4:	10 92 52 06 	sts	0x0652, r1	; 0x800652 <_edata+0x452>
  2a8:	81 e0       	ldi	r24, 0x01	; 1
- 2aa:	80 93 53 06 	sts	0x0653, r24	; 0x800653 <__DATA_REGION_ORIGIN__+0x453>
-		
-		// copy the stack to the thread 0 stack
-		uint8_t *ptr = (uint8_t *) GCC_STACK_BASE;
-		while (ptr > (uint8_t *) SP)
+ 2aa:	80 93 53 06 	sts	0x0653, r24	; 0x800653 <_edata+0x453>
  2ae:	8d b7       	in	r24, 0x3d	; 61
  2b0:	9e b7       	in	r25, 0x3e	; 62
  2b2:	8f 3f       	cpi	r24, 0xFF	; 255
@@ -453,8 +361,6 @@ static __inline__ uint8_t __iCliRetVal(void)
  2b6:	98 f4       	brcc	.+38     	; 0x2de <init+0x172>
  2b8:	ef ef       	ldi	r30, 0xFF	; 255
  2ba:	f1 e2       	ldi	r31, 0x21	; 33
-		{
-			*(kernel_data.thread_ctrl_tbl[0].stack_ptr--) = *(ptr--);
  2bc:	c0 e0       	ldi	r28, 0x00	; 0
  2be:	d6 e0       	ldi	r29, 0x06	; 6
  2c0:	a8 81       	ld	r26, Y
@@ -467,72 +373,33 @@ static __inline__ uint8_t __iCliRetVal(void)
  2ce:	31 97       	sbiw	r30, 0x01	; 1
  2d0:	21 81       	ldd	r18, Z+1	; 0x01
  2d2:	2c 93       	st	X, r18
-		kernel_data.cur_thread_id = 0;
-		kernel_data.cur_thread_mask = 0x01;
-		
-		// copy the stack to the thread 0 stack
-		uint8_t *ptr = (uint8_t *) GCC_STACK_BASE;
-		while (ptr > (uint8_t *) SP)
  2d4:	2d b7       	in	r18, 0x3d	; 61
  2d6:	3e b7       	in	r19, 0x3e	; 62
  2d8:	2e 17       	cp	r18, r30
  2da:	3f 07       	cpc	r19, r31
  2dc:	88 f3       	brcs	.-30     	; 0x2c0 <init+0x154>
-		{
-			*(kernel_data.thread_ctrl_tbl[0].stack_ptr--) = *(ptr--);
-		}
-		SP = (uint16_t) kernel_data.thread_ctrl_tbl[0].stack_ptr;
- 2de:	80 91 00 06 	lds	r24, 0x0600	; 0x800600 <__DATA_REGION_ORIGIN__+0x400>
- 2e2:	90 91 01 06 	lds	r25, 0x0601	; 0x800601 <__DATA_REGION_ORIGIN__+0x401>
+ 2de:	80 91 00 06 	lds	r24, 0x0600	; 0x800600 <_edata+0x400>
+ 2e2:	90 91 01 06 	lds	r25, 0x0601	; 0x800601 <_edata+0x401>
  2e6:	9e bf       	out	0x3e, r25	; 62
  2e8:	8d bf       	out	0x3d, r24	; 61
-		
-		// initialize system timer
-		init_system_timer();
  2ea:	0f df       	rcall	.-482    	; 0x10a <init_system_timer>
-    (void)__s;
-}
-
-static __inline__ void __iRestore(const  uint8_t *__s)
-{
-    SREG = *__s;
  2ec:	1f bf       	out	0x3f, r17	; 63
-	}
-}
  2ee:	df 91       	pop	r29
  2f0:	cf 91       	pop	r28
  2f2:	1f 91       	pop	r17
  2f4:	08 95       	ret
 
 000002f6 <delay>:
- *	Delays the current thread by at least the specified number of milliseconds and yield.
- *
- *	t: minimum delay time in milliseconds
- */
-void delay(uint16_t t)
-{
  2f6:	ac 01       	movw	r20, r24
-	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
  2f8:	2f b7       	in	r18, 0x3f	; 63
-    return 1;
-}
-
-static __inline__ uint8_t __iCliRetVal(void)
-{
-    cli();
  2fa:	f8 94       	cli
-	{
-		// set current thread's delay bit
-		kernel_data.delay_status |= kernel_data.cur_thread_mask;
- 2fc:	80 91 53 06 	lds	r24, 0x0653	; 0x800653 <__DATA_REGION_ORIGIN__+0x453>
+ 2fc:	80 91 53 06 	lds	r24, 0x0653	; 0x800653 <_edata+0x453>
  300:	e1 e4       	ldi	r30, 0x41	; 65
  302:	f6 e0       	ldi	r31, 0x06	; 6
  304:	90 81       	ld	r25, Z
  306:	98 2b       	or	r25, r24
  308:	90 83       	st	Z, r25
-		// set current thread's delay counter
-		kernel_data.delay_ctrs[kernel_data.cur_thread_id] = t;
- 30a:	e0 91 52 06 	lds	r30, 0x0652	; 0x800652 <__DATA_REGION_ORIGIN__+0x452>
+ 30a:	e0 91 52 06 	lds	r30, 0x0652	; 0x800652 <_edata+0x452>
  30e:	f0 e0       	ldi	r31, 0x00	; 0
  310:	ee 0f       	add	r30, r30
  312:	ff 1f       	adc	r31, r31
@@ -540,15 +407,7 @@ static __inline__ uint8_t __iCliRetVal(void)
  316:	f9 4f       	sbci	r31, 0xF9	; 249
  318:	51 83       	std	Z+1, r21	; 0x01
  31a:	40 83       	st	Z, r20
-    (void)__s;
-}
-
-static __inline__ void __iRestore(const  uint8_t *__s)
-{
-    SREG = *__s;
  31c:	2f bf       	out	0x3f, r18	; 63
-	}
-	yield();
  31e:	d1 c0       	rjmp	.+418    	; 0x4c2 <yield>
  320:	08 95       	ret
 
@@ -694,7 +553,7 @@ void new(uint8_t thread_id, PTHREAD entry_point, bool enabled)
 	
 	// if the current thread is being recreated, verify stack canary and invoke the scheduler
 	if (thread_id == kernel_data.cur_thread_id)
- 3e4:	80 91 52 06 	lds	r24, 0x0652	; 0x800652 <__DATA_REGION_ORIGIN__+0x452>
+ 3e4:	80 91 52 06 	lds	r24, 0x0652	; 0x800652 <_edata+0x452>
  3e8:	f8 12       	cpse	r15, r24
  3ea:	11 c0       	rjmp	.+34     	; 0x40e <__LOCK_REGION_LENGTH__+0xe>
 	{
@@ -716,7 +575,7 @@ void new(uint8_t thread_id, PTHREAD entry_point, bool enabled)
  408:	09 f0       	breq	.+2      	; 0x40c <__LOCK_REGION_LENGTH__+0xc>
 		schedule();
  40a:	8b df       	rcall	.-234    	; 0x322 <stack_overflow>
- 40c:	91 d0       	rcall	.+290    	; 0x530 <schedule>
+ 40c:	96 d0       	rcall	.+300    	; 0x53a <schedule>
 	}
 }
  40e:	df 91       	pop	r29
@@ -734,7 +593,7 @@ void new(uint8_t thread_id, PTHREAD entry_point, bool enabled)
 00000424 <__vector_13>:
 
 /*
- *	ISR for timer 2. Set to fire every milisecond
+ *	ISR for timer 2. Set to fire every millisecond
  */
 ISR(TIMER2_COMPA_vect)
 {
@@ -845,255 +704,242 @@ ISR(TIMER2_COMPA_vect)
  4c0:	18 95       	reti
 
 000004c2 <yield>:
-    return 1;
-}
 
-static __inline__ uint8_t __iCliRetVal(void)
-{
-    cli();
- 4c2:	f8 94       	cli
 
 void yield()
 {
-	ATOMIC_BLOCK(ATOMIC_FORCEON)
+	asm volatile ("push r2\n\
+ 4c2:	2f 92       	push	r2
+ 4c4:	3f 92       	push	r3
+ 4c6:	4f 92       	push	r4
+ 4c8:	5f 92       	push	r5
+ 4ca:	6f 92       	push	r6
+ 4cc:	7f 92       	push	r7
+ 4ce:	8f 92       	push	r8
+ 4d0:	9f 92       	push	r9
+ 4d2:	af 92       	push	r10
+ 4d4:	bf 92       	push	r11
+ 4d6:	cf 92       	push	r12
+ 4d8:	df 92       	push	r13
+ 4da:	ef 92       	push	r14
+ 4dc:	ff 92       	push	r15
+ 4de:	0f 93       	push	r16
+ 4e0:	1f 93       	push	r17
+ 4e2:	cf 93       	push	r28
+ 4e4:	df 93       	push	r29
+				   push r16\n\
+				   push r17\n\
+				   push r28\n\
+				   push r29");
+	
+	if (*kernel_data.thread_ctrl_tbl[kernel_data.cur_thread_id].canary_ptr != CANARY)
+ 4e6:	e0 91 52 06 	lds	r30, 0x0652	; 0x800652 <_edata+0x452>
+ 4ea:	f0 e0       	ldi	r31, 0x00	; 0
+ 4ec:	ee 0f       	add	r30, r30
+ 4ee:	ff 1f       	adc	r31, r31
+ 4f0:	ee 0f       	add	r30, r30
+ 4f2:	ff 1f       	adc	r31, r31
+ 4f4:	ee 0f       	add	r30, r30
+ 4f6:	ff 1f       	adc	r31, r31
+ 4f8:	ec 5f       	subi	r30, 0xFC	; 252
+ 4fa:	f9 4f       	sbci	r31, 0xF9	; 249
+ 4fc:	01 90       	ld	r0, Z+
+ 4fe:	f0 81       	ld	r31, Z
+ 500:	e0 2d       	mov	r30, r0
+ 502:	80 81       	ld	r24, Z
+ 504:	8a 3a       	cpi	r24, 0xAA	; 170
+ 506:	09 f0       	breq	.+2      	; 0x50a <yield+0x48>
 	{
-		asm volatile ("push r2\n\
- 4c4:	2f 92       	push	r2
- 4c6:	3f 92       	push	r3
- 4c8:	4f 92       	push	r4
- 4ca:	5f 92       	push	r5
- 4cc:	6f 92       	push	r6
- 4ce:	7f 92       	push	r7
- 4d0:	8f 92       	push	r8
- 4d2:	9f 92       	push	r9
- 4d4:	af 92       	push	r10
- 4d6:	bf 92       	push	r11
- 4d8:	cf 92       	push	r12
- 4da:	df 92       	push	r13
- 4dc:	ef 92       	push	r14
- 4de:	ff 92       	push	r15
- 4e0:	0f 93       	push	r16
- 4e2:	1f 93       	push	r17
- 4e4:	cf 93       	push	r28
- 4e6:	df 93       	push	r29
-					   push r16\n\
-					   push r17\n\
-					   push r28\n\
-					   push r29");
-		
-		if (*kernel_data.thread_ctrl_tbl[kernel_data.cur_thread_id].canary_ptr != CANARY)
- 4e8:	e0 91 52 06 	lds	r30, 0x0652	; 0x800652 <__DATA_REGION_ORIGIN__+0x452>
- 4ec:	f0 e0       	ldi	r31, 0x00	; 0
- 4ee:	ee 0f       	add	r30, r30
- 4f0:	ff 1f       	adc	r31, r31
- 4f2:	ee 0f       	add	r30, r30
- 4f4:	ff 1f       	adc	r31, r31
- 4f6:	ee 0f       	add	r30, r30
- 4f8:	ff 1f       	adc	r31, r31
- 4fa:	ec 5f       	subi	r30, 0xFC	; 252
- 4fc:	f9 4f       	sbci	r31, 0xF9	; 249
- 4fe:	01 90       	ld	r0, Z+
- 500:	f0 81       	ld	r31, Z
- 502:	e0 2d       	mov	r30, r0
- 504:	80 81       	ld	r24, Z
- 506:	8a 3a       	cpi	r24, 0xAA	; 170
- 508:	09 f0       	breq	.+2      	; 0x50c <yield+0x4a>
-		{
-			stack_overflow();
- 50a:	0b df       	rcall	.-490    	; 0x322 <stack_overflow>
-		}
-		
-		kernel_data.thread_ctrl_tbl[kernel_data.cur_thread_id].stack_ptr = (uint8_t *) SP;
- 50c:	e0 91 52 06 	lds	r30, 0x0652	; 0x800652 <__DATA_REGION_ORIGIN__+0x452>
- 510:	f0 e0       	ldi	r31, 0x00	; 0
- 512:	8d b7       	in	r24, 0x3d	; 61
- 514:	9e b7       	in	r25, 0x3e	; 62
- 516:	ee 0f       	add	r30, r30
- 518:	ff 1f       	adc	r31, r31
- 51a:	ee 0f       	add	r30, r30
- 51c:	ff 1f       	adc	r31, r31
- 51e:	ee 0f       	add	r30, r30
- 520:	ff 1f       	adc	r31, r31
- 522:	e0 50       	subi	r30, 0x00	; 0
- 524:	fa 4f       	sbci	r31, 0xFA	; 250
- 526:	91 83       	std	Z+1, r25	; 0x01
-		
-		asm volatile ("jmp schedule");
- 528:	80 83       	st	Z, r24
- 52a:	02 c0       	rjmp	.+4      	; 0x530 <schedule>
-    return 1;
-}
+		stack_overflow();
+ 508:	0c df       	rcall	.-488    	; 0x322 <stack_overflow>
+	}
+	
+	kernel_data.thread_ctrl_tbl[kernel_data.cur_thread_id].stack_ptr = (uint8_t *) SP;
+ 50a:	e0 91 52 06 	lds	r30, 0x0652	; 0x800652 <_edata+0x452>
+ 50e:	f0 e0       	ldi	r31, 0x00	; 0
+ 510:	8d b7       	in	r24, 0x3d	; 61
+ 512:	9e b7       	in	r25, 0x3e	; 62
+ 514:	ee 0f       	add	r30, r30
+ 516:	ff 1f       	adc	r31, r31
+ 518:	ee 0f       	add	r30, r30
+ 51a:	ff 1f       	adc	r31, r31
+ 51c:	ee 0f       	add	r30, r30
+ 51e:	ff 1f       	adc	r31, r31
+ 520:	e0 50       	subi	r30, 0x00	; 0
+ 522:	fa 4f       	sbci	r31, 0xFA	; 250
+ 524:	91 83       	std	Z+1, r25	; 0x01
+ 526:	80 83       	st	Z, r24
+	
+	cli();
+	asm volatile ("jmp schedule");
+ 528:	f8 94       	cli
+ 52a:	07 c0       	rjmp	.+14     	; 0x53a <schedule>
 
-static __inline__ void __iSeiParam(const uint8_t *__s)
-{
-    sei();
+0000052c <sleep_mode>:
  52c:	78 94       	sei
-    __asm__ volatile ("" ::: "memory");
- 52e:	08 95       	ret
+void sleep_mode()
+{
+	sei();
+	uint8_t sleep_mode_enable = 0b1;
+	uint8_t sleep_mode_select = 0b111;
+	SMCR |= (sleep_mode_select << SM0) | (sleep_mode_enable << SE);
+ 52e:	83 b7       	in	r24, 0x33	; 51
+ 530:	8f 60       	ori	r24, 0x0F	; 15
+ 532:	83 bf       	out	0x33, r24	; 51
+	asm volatile ("sleep");
+ 534:	88 95       	sleep
+	cli();
+ 536:	f8 94       	cli
+ 538:	08 95       	ret
 
-00000530 <schedule>:
-    return 1;
+0000053a <schedule>:
 }
 
-static __inline__ uint8_t __iCliRetVal(void)
+void __attribute__ ((OS_main)) schedule()
 {
-    cli();
- 530:	f8 94       	cli
-void schedule()
-{
-	ATOMIC_BLOCK(ATOMIC_FORCEON)
+	uint8_t ready_status = 0x00;
+	while (!(ready_status = ~(kernel_data.disable_status | kernel_data.delay_status)))
+ 53a:	90 91 40 06 	lds	r25, 0x0640	; 0x800640 <_edata+0x440>
+ 53e:	80 91 41 06 	lds	r24, 0x0641	; 0x800641 <_edata+0x441>
+ 542:	89 2b       	or	r24, r25
+ 544:	80 95       	com	r24
+ 546:	59 f4       	brne	.+22     	; 0x55e <schedule+0x24>
+ 548:	00 e4       	ldi	r16, 0x40	; 64
+ 54a:	16 e0       	ldi	r17, 0x06	; 6
+ 54c:	c1 e4       	ldi	r28, 0x41	; 65
+ 54e:	d6 e0       	ldi	r29, 0x06	; 6
 	{
-		uint8_t ready_status = 0x00;
-		while (!(ready_status = kernel_data.disable_status | kernel_data.disable_status))
- 532:	e0 e4       	ldi	r30, 0x40	; 64
- 534:	f6 e0       	ldi	r31, 0x06	; 6
- 536:	90 81       	ld	r25, Z
- 538:	80 81       	ld	r24, Z
- 53a:	89 2b       	or	r24, r25
- 53c:	e1 f3       	breq	.-8      	; 0x536 <schedule+0x6>
-		{
-			sleep_mode();
-		}
-		uint8_t tid = kernel_data.cur_thread_id;
- 53e:	e0 91 52 06 	lds	r30, 0x0652	; 0x800652 <__DATA_REGION_ORIGIN__+0x452>
-		uint8_t tmsk = kernel_data.cur_thread_mask;
- 542:	90 91 53 06 	lds	r25, 0x0653	; 0x800653 <__DATA_REGION_ORIGIN__+0x453>
-		
-		do
-		{
-			tid = (tid + 1) & 0x07;
- 546:	ef 5f       	subi	r30, 0xFF	; 255
- 548:	e7 70       	andi	r30, 0x07	; 7
-			asm volatile ("lsl %1\n"
- 54a:	99 0f       	add	r25, r25
- 54c:	91 1d       	adc	r25, r1
-						  "adc %1, r1"
-						  : "=r" (tmsk)
-						  : "r" (tmsk));
-		} while (!(ready_status & tmsk));
- 54e:	28 2f       	mov	r18, r24
- 550:	29 23       	and	r18, r25
- 552:	c9 f3       	breq	.-14     	; 0x546 <schedule+0x16>
-		
-		kernel_data.cur_thread_id = tid;
- 554:	e0 93 52 06 	sts	0x0652, r30	; 0x800652 <__DATA_REGION_ORIGIN__+0x452>
-		kernel_data.cur_thread_mask = tmsk;
- 558:	90 93 53 06 	sts	0x0653, r25	; 0x800653 <__DATA_REGION_ORIGIN__+0x453>
-		
-		SP = (uint16_t) kernel_data.thread_ctrl_tbl[tid].stack_ptr;
- 55c:	f0 e0       	ldi	r31, 0x00	; 0
- 55e:	ee 0f       	add	r30, r30
- 560:	ff 1f       	adc	r31, r31
- 562:	ee 0f       	add	r30, r30
- 564:	ff 1f       	adc	r31, r31
- 566:	ee 0f       	add	r30, r30
- 568:	ff 1f       	adc	r31, r31
- 56a:	e0 50       	subi	r30, 0x00	; 0
- 56c:	fa 4f       	sbci	r31, 0xFA	; 250
- 56e:	80 81       	ld	r24, Z
- 570:	91 81       	ldd	r25, Z+1	; 0x01
- 572:	9e bf       	out	0x3e, r25	; 62
- 574:	8d bf       	out	0x3d, r24	; 61
-		
-		asm volatile ("pop r29\n\
- 576:	df 91       	pop	r29
- 578:	cf 91       	pop	r28
- 57a:	1f 91       	pop	r17
- 57c:	0f 91       	pop	r16
- 57e:	ff 90       	pop	r15
- 580:	ef 90       	pop	r14
- 582:	df 90       	pop	r13
- 584:	cf 90       	pop	r12
- 586:	bf 90       	pop	r11
- 588:	af 90       	pop	r10
- 58a:	9f 90       	pop	r9
- 58c:	8f 90       	pop	r8
- 58e:	7f 90       	pop	r7
- 590:	6f 90       	pop	r6
- 592:	5f 90       	pop	r5
- 594:	4f 90       	pop	r4
- 596:	3f 90       	pop	r3
- 598:	2f 90       	pop	r2
-    return 1;
+		sleep_mode();
+ 550:	ed df       	rcall	.-38     	; 0x52c <sleep_mode>
 }
 
-static __inline__ void __iSeiParam(const uint8_t *__s)
+void __attribute__ ((OS_main)) schedule()
 {
-    sei();
- 59a:	78 94       	sei
-    __asm__ volatile ("" ::: "memory");
- 59c:	08 95       	ret
-
-0000059e <f0>:
-
-void f0()
-{
-	while(1)
+	uint8_t ready_status = 0x00;
+	while (!(ready_status = ~(kernel_data.disable_status | kernel_data.delay_status)))
+ 552:	f8 01       	movw	r30, r16
+ 554:	90 81       	ld	r25, Z
+ 556:	88 81       	ld	r24, Y
+ 558:	89 2b       	or	r24, r25
+ 55a:	80 95       	com	r24
+ 55c:	c9 f3       	breq	.-14     	; 0x550 <schedule+0x16>
 	{
-		delay(3);
- 59e:	83 e0       	ldi	r24, 0x03	; 3
- 5a0:	90 e0       	ldi	r25, 0x00	; 0
- 5a2:	a9 de       	rcall	.-686    	; 0x2f6 <delay>
- 5a4:	fc cf       	rjmp	.-8      	; 0x59e <f0>
-
-000005a6 <f1>:
-
-void f1()
-{
-	while(1)
+		sleep_mode();
+	}
+	uint8_t tid = kernel_data.cur_thread_id;
+ 55e:	e0 91 52 06 	lds	r30, 0x0652	; 0x800652 <_edata+0x452>
+	uint8_t tmsk = kernel_data.cur_thread_mask;
+ 562:	90 91 53 06 	lds	r25, 0x0653	; 0x800653 <_edata+0x453>
+	
+	do
 	{
-		delay(5);
- 5a6:	85 e0       	ldi	r24, 0x05	; 5
- 5a8:	90 e0       	ldi	r25, 0x00	; 0
- 5aa:	a5 de       	rcall	.-694    	; 0x2f6 <delay>
- 5ac:	fc cf       	rjmp	.-8      	; 0x5a6 <f1>
+		tid = (tid + 1) & 0x07;
+ 566:	ef 5f       	subi	r30, 0xFF	; 255
+ 568:	e7 70       	andi	r30, 0x07	; 7
+		asm volatile ("lsl %1\n"
+ 56a:	99 0f       	add	r25, r25
+ 56c:	91 1d       	adc	r25, r1
+					  "adc %1, r1"
+					  : "=r" (tmsk)
+					  : "r" (tmsk));
+	} while (!(ready_status & tmsk));
+ 56e:	29 2f       	mov	r18, r25
+ 570:	28 23       	and	r18, r24
+ 572:	c9 f3       	breq	.-14     	; 0x566 <schedule+0x2c>
+	
+	kernel_data.cur_thread_id = tid;
+ 574:	e0 93 52 06 	sts	0x0652, r30	; 0x800652 <_edata+0x452>
+	kernel_data.cur_thread_mask = tmsk;
+ 578:	90 93 53 06 	sts	0x0653, r25	; 0x800653 <_edata+0x453>
+	
+	SP = (uint16_t) kernel_data.thread_ctrl_tbl[tid].stack_ptr;
+ 57c:	f0 e0       	ldi	r31, 0x00	; 0
+ 57e:	ee 0f       	add	r30, r30
+ 580:	ff 1f       	adc	r31, r31
+ 582:	ee 0f       	add	r30, r30
+ 584:	ff 1f       	adc	r31, r31
+ 586:	ee 0f       	add	r30, r30
+ 588:	ff 1f       	adc	r31, r31
+ 58a:	e0 50       	subi	r30, 0x00	; 0
+ 58c:	fa 4f       	sbci	r31, 0xFA	; 250
+ 58e:	80 81       	ld	r24, Z
+ 590:	91 81       	ldd	r25, Z+1	; 0x01
+ 592:	9e bf       	out	0x3e, r25	; 62
+ 594:	8d bf       	out	0x3d, r24	; 61
+	
+	asm volatile ("pop r29\n\
+ 596:	df 91       	pop	r29
+ 598:	cf 91       	pop	r28
+ 59a:	1f 91       	pop	r17
+ 59c:	0f 91       	pop	r16
+ 59e:	ff 90       	pop	r15
+ 5a0:	ef 90       	pop	r14
+ 5a2:	df 90       	pop	r13
+ 5a4:	cf 90       	pop	r12
+ 5a6:	bf 90       	pop	r11
+ 5a8:	af 90       	pop	r10
+ 5aa:	9f 90       	pop	r9
+ 5ac:	8f 90       	pop	r8
+ 5ae:	7f 90       	pop	r7
+ 5b0:	6f 90       	pop	r6
+ 5b2:	5f 90       	pop	r5
+ 5b4:	4f 90       	pop	r4
+ 5b6:	3f 90       	pop	r3
+ 5b8:	2f 90       	pop	r2
+				   pop r6\n\
+				   pop r5\n\
+				   pop r4\n\
+				   pop r3\n\
+				   pop r2");
+	sei();
+ 5ba:	78 94       	sei
+ 5bc:	08 95       	ret
 
-000005ae <f2>:
+000005be <f0>:
 
 void f2()
 {
 	while(1)
 	{
 		delay(7);
- 5ae:	87 e0       	ldi	r24, 0x07	; 7
- 5b0:	90 e0       	ldi	r25, 0x00	; 0
- 5b2:	a1 de       	rcall	.-702    	; 0x2f6 <delay>
- 5b4:	fc cf       	rjmp	.-8      	; 0x5ae <f2>
+ 5be:	10 e8       	ldi	r17, 0x80	; 128
+ 5c0:	14 b9       	out	0x04, r17	; 4
+ 5c2:	c4 e1       	ldi	r28, 0x14	; 20
+ 5c4:	d0 e0       	ldi	r29, 0x00	; 0
+ 5c6:	2f 9a       	sbi	0x05, 7	; 5
+ 5c8:	88 ec       	ldi	r24, 0xC8	; 200
+ 5ca:	90 e0       	ldi	r25, 0x00	; 0
+ 5cc:	94 de       	rcall	.-728    	; 0x2f6 <delay>
+ 5ce:	2f 98       	cbi	0x05, 7	; 5
+ 5d0:	82 e3       	ldi	r24, 0x32	; 50
+ 5d2:	90 e0       	ldi	r25, 0x00	; 0
+ 5d4:	90 de       	rcall	.-736    	; 0x2f6 <delay>
+ 5d6:	21 97       	sbiw	r28, 0x01	; 1
+ 5d8:	b1 f7       	brne	.-20     	; 0x5c6 <f0+0x8>
+ 5da:	80 e1       	ldi	r24, 0x10	; 16
+ 5dc:	97 e2       	ldi	r25, 0x27	; 39
+ 5de:	8b de       	rcall	.-746    	; 0x2f6 <delay>
+ 5e0:	ef cf       	rjmp	.-34     	; 0x5c0 <f0+0x2>
 
-000005b6 <main>:
+000005e2 <main>:
 	}
 }
 
 int main(void)
 {
     init();
- 5b6:	da dd       	rcall	.-1100   	; 0x16c <init>
+ 5e2:	c4 dd       	rcall	.-1144   	; 0x16c <init>
 	
-	new(1, f1, true);
- 5b8:	41 e0       	ldi	r20, 0x01	; 1
- 5ba:	63 ed       	ldi	r22, 0xD3	; 211
- 5bc:	72 e0       	ldi	r23, 0x02	; 2
- 5be:	81 e0       	ldi	r24, 0x01	; 1
- 5c0:	be de       	rcall	.-644    	; 0x33e <new>
-	new(2, f2, true);
- 5c2:	41 e0       	ldi	r20, 0x01	; 1
- 5c4:	67 ed       	ldi	r22, 0xD7	; 215
- 5c6:	72 e0       	ldi	r23, 0x02	; 2
- 5c8:	82 e0       	ldi	r24, 0x02	; 2
- 5ca:	b9 de       	rcall	.-654    	; 0x33e <new>
 	new(0, f0, true);
- 5cc:	41 e0       	ldi	r20, 0x01	; 1
- 5ce:	6f ec       	ldi	r22, 0xCF	; 207
- 5d0:	72 e0       	ldi	r23, 0x02	; 2
- 5d2:	80 e0       	ldi	r24, 0x00	; 0
-	
-	yield();
- 5d4:	b4 de       	rcall	.-664    	; 0x33e <new>
- 5d6:	75 df       	rcall	.-278    	; 0x4c2 <yield>
- 5d8:	ff cf       	rjmp	.-2      	; 0x5d8 <main+0x22>
+ 5e4:	41 e0       	ldi	r20, 0x01	; 1
+ 5e6:	6f ed       	ldi	r22, 0xDF	; 223
+ 5e8:	72 e0       	ldi	r23, 0x02	; 2
+ 5ea:	80 e0       	ldi	r24, 0x00	; 0
+ 5ec:	a8 de       	rcall	.-688    	; 0x33e <new>
+ 5ee:	ff cf       	rjmp	.-2      	; 0x5ee <main+0xc>
 
-000005da <_exit>:
- 5da:	f8 94       	cli
+000005f0 <_exit>:
+ 5f0:	f8 94       	cli
 
-000005dc <__stop_program>:
- 5dc:	ff cf       	rjmp	.-2      	; 0x5dc <__stop_program>
+000005f2 <__stop_program>:
+ 5f2:	ff cf       	rjmp	.-2      	; 0x5f2 <__stop_program>

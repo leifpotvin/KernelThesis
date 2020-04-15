@@ -190,6 +190,21 @@ void delay(uint16_t t)
 	yield();
 }
 
+void enable(uint8_t thread_id)
+{
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+	{
+		kernel_data.disable_status |= 0b1 << thread_id;
+	}
+}
+
+void disable(uint8_t thread_id)
+{
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+	{
+		kernel_data.disable_status &= ~(0b1 << thread_id);
+	}
+}
 /*
  *	Function that will be entered when a stack overflow is detected.
  */

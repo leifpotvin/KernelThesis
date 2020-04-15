@@ -17,7 +17,15 @@ void f0()
 {
 	while(1)
 	{
-		delay(3);
+		DDRB = 0x80;
+		for (int i = 0; i < 20; ++i)
+		{
+			PORTB |= 0x80;
+			delay(200);
+			PORTB &= ~(0x80);
+			delay(50);
+		}
+		delay(10000);
 	}
 }
 
@@ -41,11 +49,7 @@ int main(void)
 {
     init();
 	
-	new(1, f1, true);
-	new(2, f2, true);
 	new(0, f0, true);
-	
-	yield();
     while (1) 
     {
     }

@@ -74,6 +74,9 @@ typedef struct
 	volatile uint8_t cur_thread_mask;
 	
 	uint32_t system_time_millis;
+#	ifdef	 PREEMPTIVE
+	uint8_t thread_quantum_time_millis;
+#	endif /* PREEMPTIVE */
 } kernel_data_struct;
 
 volatile kernel_data_struct kernel_data;
@@ -83,9 +86,15 @@ void init();
 void new(uint8_t, PTHREAD, bool);
 #ifndef PREEMPTIVE
 void yield();
+#else
+void lock();
+void unlock();
 #endif /* PREEMPTIVE */
 void schedule();
 void delay(uint16_t);
+void enable(uint8_t);
+void disable(uint8_t);
+
 void stack_overflow();
 
 #endif /* __ASSEMBLER__ */
