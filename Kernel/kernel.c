@@ -17,40 +17,11 @@
 #include "kernel.h"
 
 // local function prototypes
-void init_system_timer();
+extern void init_system_timer();
 void push_pthread(uint8_t, PTHREAD);
 
 /****************************************************************************
 *	Local function definitions
-****************************************************************************/
-
-/*
- *	Initializes the system timer.
- */
-void init_system_timer()
-{
-	// initialize all needed registers
-	uint8_t com2a = 0b00;	// output pin is disconnected
-	uint8_t com2b = 0b00;	// output pin is disconnected
-	uint8_t wgm2 = 0b010;	// CTC mode with TOP at OCRA
-	uint8_t foc2a = 0b0;
-	uint8_t foc2b = 0b0;
-	uint8_t cs2 = 0b101;	// use clkt2s/128 prescaller
-	uint8_t ocie2a = 0b1;	// enable compare match A interrupt
-	uint8_t ocie2b = 0b0;	// disable compare match b interrupt
-	uint8_t toie2 = 0b0;	// disable overflow interrupt
-	
-	TCCR2A = (com2a << COM2A0) | (com2b << COM2B0) | ((wgm2 & 0b11) << WGM20);
-	TCCR2B = (foc2a << FOC2A) | (foc2b << FOC2B) | (((wgm2 & 0b100) >> 2) << WGM22) | (cs2 << CS20);
-	OCR2A = (F_CPU / 1000) / 128 - 1;
-	TIMSK2 = (ocie2a << OCIE2A) | (ocie2b << OCIE2B) | (toie2 << TOIE2);
-	
-	// set timer to zero
-	kernel_data.system_time_millis = 0;
-}
-
-/****************************************************************************
-*	Kernel function definitions
 ****************************************************************************/
 
 /*
@@ -72,6 +43,10 @@ void push_pthread(uint8_t tid, PTHREAD func)
 	//trampoline tables are used for functions in high parts of program memory
 	*(kernel_data.thread_ctrl_tbl[tid].stack_ptr--) = (uint8_t) (0x00);
 }
+
+/****************************************************************************
+*	Kernel function definitions
+****************************************************************************/
 
 /*
  *	Initializes kernel data structures.
@@ -187,7 +162,7 @@ void delay(uint16_t t)
 		// set current thread's delay counter
 		kernel_data.delay_ctrs[kernel_data.cur_thread_id] = t;
 	}
-	yield();
+	//yield();TODO
 }
 
 void enable(uint8_t thread_id)

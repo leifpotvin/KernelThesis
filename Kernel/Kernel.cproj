@@ -109,7 +109,7 @@
     <ListValues>
       <Value>DEBUG</Value>
       <Value>F_CPU=16000000</Value>
-      <Value>NPREEMPTIVE</Value>
+      <Value>PREEMPTIVE</Value>
     </ListValues>
   </avrgcc.compiler.symbols.DefSymbols>
   <avrgcc.compiler.directories.IncludePaths>

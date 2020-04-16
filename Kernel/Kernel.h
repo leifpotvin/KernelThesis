@@ -75,7 +75,7 @@ typedef struct
 	
 	uint32_t system_time_millis;
 #	ifdef	 PREEMPTIVE
-	uint8_t thread_quantum_time_millis;
+	uint8_t thread_time_slice_clock;
 #	endif /* PREEMPTIVE */
 } kernel_data_struct;
 
