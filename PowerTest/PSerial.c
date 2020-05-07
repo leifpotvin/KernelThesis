@@ -47,7 +47,8 @@ void PSerial_open(uint8_t port, long speed, int framing)
 	volatile UART_PORT *PORTn;
 	get_port(port, &PORTn);
 	
-	// Has predetermined UBRR's to pick from (makes it faster since it doesn't need to use the calculation)
+	// Has predetermined UBRR's to pick from 
+	// (makes it faster since it doesn't need to use the calculation)
 	switch (speed)
 	{
 		case 2400:
@@ -93,15 +94,21 @@ void PSerial_open(uint8_t port, long speed, int framing)
 			PORTn->UBRRn = 1;
 			break;
 		default:
-			PORTn->UBRRn = (F_CPU / (8 * speed)) - 1; // Function used to determine the UBRR
+			// Function used to determine the UBRR
+			PORTn->UBRRn = (F_CPU / (8 * speed)) - 1; 
 	}
 	
 	PORTn->UCSRnA |= (1<<U2X0);
-	// Set the UCSRnB register for Rx complete interrupt (RXCIE), Tx complete interrupt (TXCIE), Data register empty interrupt (UDRIE),
+	// Set the UCSRnB register for Rx complete interrupt (RXCIE), 
+	// Tx complete interrupt (TXCIE), Data register empty interrupt (UDRIE),
 	// Receiver enable (RXEN), and Transmitter enable (TXEN)
-	PORTn->UCSRnB |= (0b0<<RXCIE0) | (0b0<<TXCIE0) | (0b0<<UDRIE0) | (0b1<<RXEN0) | (0b1<<TXEN0);
-	// Set the UCSRnC register for USART mode select (UMSELn0), Parity mode (UPMn0), Stop bit select (USBSn), Character size (UCSZn0)
-	PORTn->UCSRnC |= (0b00<<UMSEL00) | (((framing>>PARITYBITS)&0x3)<<UPM00) | (((framing>>STOPBITS)&0x1)<<USBS0) | (((framing>>DATABITS)&0x7)<<UCSZ00);
+	PORTn->UCSRnB |= (0b0<<RXCIE0) | (0b0<<TXCIE0) | (0b0<<UDRIE0) 
+				  | (0b1<<RXEN0) | (0b1<<TXEN0);
+	// Set the UCSRnC register for USART mode select (UMSELn0), 
+	// Parity mode (UPMn0), Stop bit select (USBSn), Character size (UCSZn0)
+	PORTn->UCSRnC |= (0b00<<UMSEL00) | (((framing>>PARITYBITS)&0x3)<<UPM00) 
+				   | (((framing>>STOPBITS)&0x1)<<USBS0) 
+				   | (((framing>>DATABITS)&0x7)<<UCSZ00);
 }
 
 /**

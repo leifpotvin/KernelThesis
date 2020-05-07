@@ -2,7 +2,7 @@
  * main2.c
  *
  * Created: 4/4/2020 6:34:41 PM
- *  Author: liefp
+ *  Author: Nathan Potvin
  */ 
 
 #include <avr/io.h>
@@ -90,11 +90,14 @@ void ext_standby()
 	__asm__("sleep");
 }
 
-// array of tthe sleep modes
-void (*sleep_modes[7])() = {no_sleep, idle, adcnrm, power_down, power_save, standby, ext_standby};
-uint16_t modules[14] = {0x0000, TIM0, TIM1, TIM2, TIM3, TIM4, TIM5, USART0, USART1, USART2, USART3, ADC_, SPI, TWI};
+// array of the sleep modes
+void (*sleep_modes[7])() = {no_sleep, idle, adcnrm, power_down
+						  , power_save, standby, ext_standby};
+uint16_t modules[14] = {0x0000, TIM0, TIM1, TIM2, TIM3, TIM4, TIM5
+					  , USART0, USART1, USART2, USART3, ADC_, SPI, TWI};
 
-// array of modules that can be disabled for power savings with the PRR register
+// array of modules that can be disabled for power savings 
+// with the PRR register
 void (*sleep_mode)();
 uint16_t module_disable_vect;
 
@@ -227,7 +230,11 @@ int main()
 		
 		reset();
 		sleep_mode = sleep_modes[i];
-		module_disable_vect = modules[1] | modules[2] | modules[3] | modules[4] | modules[5] | modules[6] | modules[7] | modules[8] | modules[9] | modules[10] | modules[11] | modules[12] | modules[13];
+		module_disable_vect = modules[1] | modules[2] | modules[3] 
+						    | modules[4] | modules[5] | modules[6] 
+							| modules[7] | modules[8] | modules[9] 
+							| modules[10] | modules[11] | modules[12] 
+							| modules[13];
 		print_state();
 		disable_modules();
 		sleeping = true;
@@ -235,7 +242,8 @@ int main()
 		
 		reset();
 		sleep_mode = sleep_modes[i];
-		module_disable_vect = modules[1] | modules[2] | modules[3] | modules[4] | modules[5] | modules[6];
+		module_disable_vect = modules[1] | modules[2] | modules[3] | modules[4] 
+							| modules[5] | modules[6];
 		print_state();
 		disable_modules();
 		sleeping = true;
